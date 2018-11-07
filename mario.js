@@ -6,12 +6,10 @@
 
 var Mario;
 ////////////////////////////////////////////////////////////////////
-
-
 window.onload = init; // calls the function named "init"
 // declare the background image
 var bgImage = new Image();
-
+// ----------------------------------- INITALIZE MARIO
 // Is called when the window loads;
 function init() {
 marioImage = new Image();
@@ -19,7 +17,7 @@ bgImage = new Image();
 	// Initialize Mario Object
 	Mario = {
 		x: 100,
-		y: 623,
+		y: 615,
 		w: 50,
 		h: 80,
 		JumpSound: new Audio('jump.wav'),
@@ -32,18 +30,15 @@ bgImage = new Image();
 		timer: "",
 		timerInterval: 10
 	};
-
+//Causes issues?
 	marioImage.src = "mario1.png";
 	bgImage.src = "marioBG.jpg";
 	draw();
 
-	// TODO: (OPTIONAL) set mario_08.wav as background music
-	//make the space bar pause
-//mario.x, mario.y
 }
 
 ////////////////////////////////////////////////////////////////////
-
+// ----------------------------------- DRAWS INITALIZED MARIO
 function draw() {
 
 	// Get Drawing Area
@@ -53,9 +48,12 @@ function draw() {
 	// loaded, you must do it this way
 	bgImage.onload = function(){
 		ctx.drawImage(bgImage, 0, 0);
-		ctx.drawImage(marioImage, 100, 404);
-
     }
+	//Draws starting mario
+	Mario.onload = function ()
+	{
+		ctx.drawImage(marioImage, 105, 204);
+	};
 
 
 
@@ -69,19 +67,22 @@ function draw() {
 	 * TODO: Alter the y coordinates so Mario will jump while on the ground
 	 */
 	function renderMario(){
-		Mario.BackgroundSound.play();
-		if (Mario.y > 280 && Mario.moving == "up") {
+
+		//make the space bar pause??
+		// Mario.BackgroundSound.play();
+
+		if (Mario.y > 500 && Mario.moving == "up") {
 			Mario.Image.src = "mario2.png";
 			ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
-			// Change the y value each time
+			// Changes the y value each time
 			Mario.y -= 5; // move 5 px up
-		}else if(Mario.y <= 100 && Mario.moving == "up"){
+		}else if(Mario.y <= 500 && Mario.moving == "up"){
 			Mario.moving = "down";
-		} else if(Mario.y < 100 && Mario.moving == "down"){
+		} else if(Mario.y < 623 && Mario.moving == "down"){
 			Mario.Image.src = "mario2.png";
 			ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
 			Mario.y += 5; // move 5 px back down after a jump
-		}else if(Mario.y == 100 && Mario.moving == "no"){
+		}else if(Mario.y == 623 && Mario.moving == "no"){
 			Mario.moving = "up";
 			Mario.JumpSound.play();
 		}else{
@@ -93,6 +94,7 @@ function draw() {
 	}
 	///////////////////////////////////////////////////////////////////
 
+	// ----------------------------------- MOVEMENT LISTENER
 
 	/* Monitor key strokes for user input:
 	 *
@@ -105,32 +107,70 @@ function draw() {
 	 */
 	document.body.onkeydown = function(e) {  // listen for a key
 
-    	e = event || window.event;             // any kind of event
-    	var keycode = e.charCode || e.keyCode; // any kind of key
+  	e = event || window.event;             // any kind of event
+    var keycode = e.charCode || e.keyCode; // any kind of key
 		console.log(keycode);
 		// The user wants Mario to jump:
     	if(keycode === 13 && Mario.moving == "no") {
+				//Calls function render to start the program
         	Mario.timer = setInterval(render, Mario.timerInterval);
     	}
+			if(keycode ===13 && Mario.moving == "no") {
+				Mario.moving = "up";
+				//moves all the way up to the cloud and stops
+				Mario.timer = setInterval(render, Mario.timerInterval);
+			}
+			if(keycode === 37) {
+				Mario.moving = "left";
+				MarioImage.src = "marioturnsleft.png";
+				Mario.timer = setInterval(leftTurn, 60);
+				Mario.timer = setTimeout(faceForward, 200);
+				ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
+    	}
+			//right
+			if(keycode === 39) {
+				Mario.moving = "right";
+				MarioImage.src = "marioturnsright.png";
+				Mario.timer = setInterval(rightTurn, 60);
+				Mario.timer = setTimeout(faceForward, 200);
+				ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
+			}
+} //Closes onkeydown function
 
+//-----------------------------------------------Turning Left Function
+function leftTurn () {
+	ctx.drawImage(bgImage, 0, 0);
+	marioImage.src = "marioturnsleft.png";
+	ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
+	//preventing Mario from walking off the edge
+	if(Mario.moving == "left" && Mario.x > 0) {
+		Mario.x -= 10;
+	}
+} //close left
 
-
-    }
-
-    /* TODO:
-     * TODO: Capture keycodes for L and R. In each, set a timeout that calls a function
-     * TODO: to face Mario forward after 200 ms. HINT: setTimeout(function, timeInMilliSecs)
-     */
-    document.body.onkeyup = function(e) {  // listen for a key
-
-    }
+//---------------------------------------------Turning Right Function
+function rightTurn () {
+	ctx.drawImage(bgImage, 0, 0);
+	marioImage.src = "marioturnsright.png";
+	ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
+	//preventing Mario from walking off the edge
+	if(Mario.moving == "right" && Mario.x <= 1145) {
+		Mario.x += 10;
+	}
+} //close right
 
 
     /*
      * TODO: Face Mario forward. Do not forget to draw the background image first
      */
     function faceForward() {
+			ctx.drawImage(bgImage, 0, 0);
+			Mario.Image.src = "mario1.png"
+			ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
+			clearInterval(Mario.timer);
+
 
     }
 
-} // close draw()
+}
+//close draw() function
