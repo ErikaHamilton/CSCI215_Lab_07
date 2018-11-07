@@ -69,7 +69,7 @@ function draw() {
 	function renderMario(){
 
 		//make the space bar pause??
-		// Mario.BackgroundSound.play();
+		Mario.BackgroundSound.play();
 
 		if (Mario.y > 500 && Mario.moving == "up") {
 			Mario.Image.src = "mario2.png";
@@ -84,56 +84,53 @@ function draw() {
 			Mario.y += 5; // move 5 px back down after a jump
 		}else if(Mario.y == 623 && Mario.moving == "no"){
 			Mario.moving = "up";
-			Mario.JumpSound.play();
-		}else{
+		}
+		else if(Mario.y == 623 && Mario.moving == "right"){
+
+		}
+		else if(Mario.moving == "left"){
+
+		}
+		else{
 			Mario.moving = "no";
-			Mario.Image.src = "mario1.png";
-			ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
+			marioImage.src = "mario1.png";
+			ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
 			clearInterval(Mario.timer); // kills the timer
 		}
 	}
 	///////////////////////////////////////////////////////////////////
 
 	// ----------------------------------- MOVEMENT LISTENER
+	 // * TODO: Add code to set Mario image to proper image whether L or R button pressed
 
-	/* Monitor key strokes for user input:
-	 *
-	 * If Enter/Return is pressed, then call the render function
-	 * which paints the new scene to the canvas.
-	 *
-	 * TODO: Add code to set Mario image to proper image whether L or R button pressed
-	 * TODO: Stop Mario if he runs out of room
-	 *
-	 */
 	document.body.onkeydown = function(e) {  // listen for a key
-
   	e = event || window.event;             // any kind of event
     var keycode = e.charCode || e.keyCode; // any kind of key
 		console.log(keycode);
 		// The user wants Mario to jump:
-    	if(keycode === 13 && Mario.moving == "no") {
-				//Calls function render to start the program
-        	Mario.timer = setInterval(render, Mario.timerInterval);
-    	}
-			if(keycode ===13 && Mario.moving == "no") {
+			if(keycode === 13 ) {
 				Mario.moving = "up";
-				//moves all the way up to the cloud and stops
+				Mario.JumpSound.play();
 				Mario.timer = setInterval(render, Mario.timerInterval);
-			}
-			if(keycode === 37) {
+			} //move left
+			if(keycode === 37 && Mario.moving == "left" && Mario.x > 0) {
 				Mario.moving = "left";
-				MarioImage.src = "marioturnsleft.png";
-				Mario.timer = setInterval(leftTurn, 60);
+				marioImage.src = "marioturnsleft.png";
+				ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
+				// Mario.timer = setInterval(leftTurn, 100);
 				Mario.timer = setTimeout(faceForward, 200);
-				ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
+				Mario.timer = setInterval(render, Mario.timerInterval);
+
     	}
-			//right
-			if(keycode === 39) {
+			//move right
+			if(keycode === 39 && Mario.moving == "right" && Mario.x <= 1145) {
 				Mario.moving = "right";
-				MarioImage.src = "marioturnsright.png";
-				Mario.timer = setInterval(rightTurn, 60);
+				Mario.x += 5;
+				marioImage.src = "marioturnsright.png";
+				ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
+				// Mario.timer = setInterval(rightTurn, 100);
 				Mario.timer = setTimeout(faceForward, 200);
-				ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
+				Mario.timer = setInterval(render, Mario.timerInterval);
 			}
 } //Closes onkeydown function
 
@@ -141,33 +138,29 @@ function draw() {
 function leftTurn () {
 	ctx.drawImage(bgImage, 0, 0);
 	marioImage.src = "marioturnsleft.png";
-	ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
+	ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
 	//preventing Mario from walking off the edge
 	if(Mario.moving == "left" && Mario.x > 0) {
-		Mario.x -= 10;
+		Mario.x -= 5;
 	}
 } //close left
 
 //---------------------------------------------Turning Right Function
-function rightTurn () {
+// function rightTurn () {
+// 	ctx.drawImage(bgImage, 0, 0);
+// 	marioImage.src = "marioturnsright.png";
+// 	ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
+// 	//preventing Mario from walking off the edge
+// 	if(Mario.moving == "right" && Mario.x <= 1145) {
+// 		Mario.x += 5;
+// 	}
+// } //close right
+
+function faceForward() {
 	ctx.drawImage(bgImage, 0, 0);
-	marioImage.src = "marioturnsright.png";
-	ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
-	//preventing Mario from walking off the edge
-	if(Mario.moving == "right" && Mario.x <= 1145) {
-		Mario.x += 10;
-	}
-} //close right
-
-
-    /*
-     * TODO: Face Mario forward. Do not forget to draw the background image first
-     */
-    function faceForward() {
-			ctx.drawImage(bgImage, 0, 0);
-			Mario.Image.src = "mario1.png"
-			ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
-			clearInterval(Mario.timer);
+	marioImage.src = "mario1.png"
+	ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
+	clearInterval(Mario.timer);
 
 
     }
