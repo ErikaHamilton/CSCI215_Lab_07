@@ -1,9 +1,11 @@
 // JavaScript for creating interactive animations on a canvas
 ////////////////////////////////////////////////////////////////////
-// Create a Mario object which contains all the info about Mario
-// Objects are nice because they allow up to keep all the relevant
-// info about an item in one place.
-
+//Erika Hamilton --- Lab 07
+// ----------------------------------------------- BUG NOTES:
+	// 1) Line 58-62, Bug issue: Originally had this seperate marioImage.onload = function (),
+	// but it would only load him after the user hits Enter. I assume this may be because of the way JS executes
+	// 2) Once Mario is moving either Left or Right and the user hit Jumps, he will disappear until enter is hit again
+	// 3) faceForward Timeout still is not working.
 var Mario;
 ////////////////////////////////////////////////////////////////////
 window.onload = init; // calls the function named "init"
@@ -17,7 +19,7 @@ bgImage = new Image();
 	// Initialize Mario Object
 	Mario = {
 		x: 100,
-		y: 615,
+		y: 600,
 		w: 50,
 		h: 80,
 		JumpSound: new Audio('jump.wav'),
@@ -31,11 +33,11 @@ bgImage = new Image();
 		timerInterval: 10
 	};
 //Causes issues?
-	marioImage.src = "mario1.png";
 	bgImage.src = "marioBG.jpg";
 	draw();
 
 }
+
 
 ////////////////////////////////////////////////////////////////////
 // ----------------------------------- DRAWS INITALIZED MARIO
@@ -48,13 +50,15 @@ function draw() {
 	// loaded, you must do it this way
 	bgImage.onload = function(){
 		ctx.drawImage(bgImage, 0, 0);
-    }
-	//Draws starting mario
-	Mario.onload = function ()
-	{
-		ctx.drawImage(marioImage, 105, 204);
-	};
+		ctx.drawImage(marioImage, 100, 615, 50, 80);
 
+    }
+
+
+	// marioImage.onload = function ()
+	// {
+	// 	ctx.drawImage(marioImage, 100, 615, 50, 80);
+	// };
 
 
 	/////////////////////////////////////////////////////////////////
@@ -62,15 +66,9 @@ function draw() {
 		ctx.drawImage(bgImage, 0, 0);
 		renderMario();
 	}
-
-	/*
-	 * TODO: Alter the y coordinates so Mario will jump while on the ground
-	 */
 	function renderMario(){
-
-		//make the space bar pause??
+		//PERSONAL TO DO: Make the music pause when the space bar is hit
 		Mario.BackgroundSound.play();
-
 		if (Mario.y > 500 && Mario.moving == "up") {
 			Mario.Image.src = "mario2.png";
 			ctx.drawImage(Mario.Image, Mario.x, Mario.y, Mario.w, Mario.h);
@@ -85,12 +83,6 @@ function draw() {
 		}else if(Mario.y == 623 && Mario.moving == "no"){
 			Mario.moving = "up";
 		}
-		// else if(Mario.y == 623 && Mario.moving == "right"){
-		//
-		// }
-		// else if(Mario.moving == "left"){
-		//
-		// }
 		else{
 			Mario.moving = "no";
 			marioImage.src = "mario1.png";
@@ -101,7 +93,6 @@ function draw() {
 	///////////////////////////////////////////////////////////////////
 
 	// ----------------------------------- MOVEMENT LISTENER
-	 // * TODO: Add code to set Mario image to proper image whether L or R button pressed
 
 	document.body.onkeydown = function(e) {  // listen for a key
   	e = event || window.event;             // any kind of event
@@ -117,54 +108,51 @@ function draw() {
 				Mario.moving = "left";
 				marioImage.src = "marioturnsleft.png";
 				ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
-				Mario.timer = setInterval(leftTurn, 100);
 				Mario.timer = setTimeout(faceForward, 200);
-				// Mario.timer = setInterval(render, Mario.timerInterval);
-
+				leftTurn(Mario.moving);
     	}
 			//move right
 			if(keycode === 39 && Mario.x <= 1145) {
 				Mario.moving = "right";
 				Mario.x += 5;
+				//Coule be causing the flickering problem?
 				marioImage.src = "marioturnsright.png";
 				ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
-				Mario.timer = setInterval(rightTurn, 100);
 				Mario.timer = setTimeout(faceForward, 200);
-				// Mario.timer = setInterval(render, Mario.timerInterval);
+				rightTurn(Mario.moving);
 			}
 } //Closes onkeydown function
 
 //-----------------------------------------------Turning Left Function
 function leftTurn () {
 	ctx.drawImage(bgImage, 0, 0);
-	marioImage.src = "marioturnsleft.png";
+	Mario.Image.src = "marioturnsleft.png";
 	ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
+	 faceForward(setTimeout(faceForward, 200));
 	//preventing Mario from walking off the edge
 	if(Mario.moving == "left" && Mario.x > 0) {
 		Mario.x -= 5;
 	}
-	//Interval issue? or drawing the wrong image?
-	// clearInterval(Mario.timer);
 } //close left
 
 //---------------------------------------------Turning Right Function
 function rightTurn () {
 	ctx.drawImage(bgImage, 0, 0);
-	marioImage.src = "marioturnsright.png";
+	Mario.Image.src = "marioturnsright.png";
 	ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
+	faceForward(setTimeout(faceForward, 200));
 	//preventing Mario from walking off the edge
 	if(Mario.moving == "right" && Mario.x <= 1145) {
 		Mario.x += 5;
 	}
-	// clearInterval(Mario.timer);
+		// clearInterval(Mario.timer);
 } //close right
 
 function faceForward() {
 	ctx.drawImage(bgImage, 0, 0);
-	marioImage.src = "mario1.png"
+	Mario.Image.src = "mario1.png"
 	ctx.drawImage(marioImage, Mario.x, Mario.y, Mario.w, Mario.h);
-	// clearInterval(Mario.timer);
-
+	clearTimeout();
     }
 
 }
